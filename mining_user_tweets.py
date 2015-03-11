@@ -3,26 +3,24 @@ import json
 import csv
 import config
 
-def get_oauth_token():
+def get_oauth_tokens():
     f = open('oauth_token.txt', 'r')
     return [token.strip('\n') for token in f.readlines()]
 
-OAUTH_TOKEN, OAUTH_TOKEN_SECRET = get_oauth_token()
+OAUTH_TOKEN, OAUTH_TOKEN_SECRET = get_oauth_tokens()
 
 twitter = Twython(config.APP_KEY, config.APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-final_step = twitter.
 
 def pretty_print(d):
     print json.dumps(d, indent = 4)
     
+#get tweets for given user
+def get_user_tweets(screen_name):
+    results = twitter.get_user_timeline(screen_name = screen_name)
+    return results
 
-#get tweets for given query
-def get_user_tweets():
-    results = twitter.verify_credentials()
-    pretty_print(results)
-#    return results.get('statuses')
-
-get_user_tweets()
+for r in get_user_tweets('madhuvishy'):
+    print r['text']
 
 def save_tweets():
     tweets = get_user_tweets()
