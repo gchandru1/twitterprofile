@@ -19,8 +19,36 @@ def get_user_tweets(screen_name):
     results = twitter.get_user_timeline(screen_name = screen_name)
     return results
 
-for r in get_user_tweets('madhuvishy'):
-    print r['text']
+def get_user_followers(screen_name):
+    return twitter.get_followers_ids(screen_name = screen_name)
+    
+def get_user_friends(screen_name):
+    return twitter.get_friends_ids(screen_name = screen_name)
+    
+def user_lookup(uid_list):
+    user_details = twitter.lookup_user(user_id = uid_list)
+    return user_details
+
+subarraysize = 100
+
+#print list of followers
+follower_id_list = get_user_followers('madhuvishy')['ids']
+follower_names = []
+for i in range((len(follower_id_list)/subarraysize) +1):
+    uid_list = follower_id_list[i*subarraysize:((i+1)*subarraysize-1)]
+    follower_names.append(user_lookup(uid_list))
+
+#print list of friends
+friend_id_list = get_user_friends('madhuvishy')['ids']
+friend_names = []
+for i in range((len(friend_id_list)/subarraysize) +1):
+    uid_list = friend_id_list[i*subarraysize:((i+1)*subarraysize-1)]
+    friend_names.append(user_lookup(uid_list))
+
+
+#keys that can be used for analysis
+#follow_request_sent, profile_use_background_image, verified, profile_location, followers_count, statuses_count, location, following, favourites_count, time_zone, protected, status['text'] 
+
 
 def save_tweets():
     tweets = get_user_tweets()
