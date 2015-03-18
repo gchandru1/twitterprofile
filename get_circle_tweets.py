@@ -1,6 +1,7 @@
 from twython import Twython, TwythonAuthError, TwythonRateLimitError
 import json 
 import config
+import time
 
 def file_to_list(filename):
     f = open(filename, 'r')
@@ -10,12 +11,16 @@ def get_oauth_tokens():
     return file_to_list('oauth_token.txt')
 
 OAUTH_TOKEN, OAUTH_TOKEN_SECRET = get_oauth_tokens()
-twitter = Twython(config.APP_KEY, config.APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+twitter = Twython(config.APP_KEY, config.APP_SECRET, 
+                    OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
 #get tweets for given user
 def get_user_tweets(screen_name):
     try:
-        results = twitter.get_user_timeline(screen_name = screen_name, count = 200, exclude_replies = True , include_rts = True)
+        results = twitter.get_user_timeline(screen_name = screen_name, 
+                                            count = 200, 
+                                            exclude_replies = True ,
+                                            include_rts = True)
         return [result['text'] for result in results]
     except TwythonAuthError:
         print "Tweets are protected for " + screen_name
@@ -46,12 +51,20 @@ def save_tweets():
             index_seen = index
     except TwythonRateLimitError:
         print 'Twitter request limit exceeded.'
-	save_json(circle_tweet_data)
-	print 'Json upto user ' + index_seen + ' saved'
-	save_unames(circle_names[index_seen+1:])
-	print 'User_name.txt has users from ' + index_seen + 1
+        save_unames(circle_names[index_seen+1:])
+        print 'User_name.txt has users from %d', (index_seen + 1)
+        save_json(circle_tweet_data)
+        print 'Json upto user %d saved', index_seen
+        return True
     save_json(circle_tweet_data)
     open('user_names.txt', 'w').close()
     print 'All user tweets saved'
+    return False
 
-save_tweets()
+def run():
+    while save_tweets():
+        time.sleep(900)
+    print "Done"
+
+time.sleep(900)
+run()

@@ -1,6 +1,7 @@
 from twython import Twython
 import json 
 import config
+import csv
 PER_REQUEST_COUNT = 100
 
 def get_oauth_tokens():
@@ -33,8 +34,22 @@ def save_circle_names(circle):
 
 def save_circle_info(circle):
     #keys that can be used for analysis
-    #follow_request_sent, profile_use_background_image, verified, profile_location, followers_count, statuses_count, location, following, favourites_count, time_zone, protected, status['text'] 
-    pass
+    #follow_request_sent, profile_use_background_image, verified, profile_location, followers_count, 
+    #statuses_count, location, following, favourites_count, time_zone, protected, status['text'] 
+    with open('circle_info.csv', 'w') as f:
+        writer = csv.writer(f)
+        for user in circle:
+            user_status = user.get('status').get('text').encode('ascii', 'ignore') if user.get('status') else None
+            user_location = user.get('location').encode('ascii', 'ignore')
+            user_info = [user.get('follow_request_sent'), user.get('profile_use_background_image'),
+                         user.get('verified'), user.get('profile_location'), user.get('followers_count'),
+                         user.get('statuses_count'), user_location, user.get('following'),
+                         user.get('favourites_count'), user.get('time_zone'), user.get('protected'),
+                         user_status]
+            print user_info
+            writer.writerow(user_info)
+    print 'Circle info written to file'
+
     
 def save_circle(screen_name):
     follower_ids = set(twitter.get_followers_ids(screen_name = screen_name)['ids'])
