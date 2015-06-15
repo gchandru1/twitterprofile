@@ -21,7 +21,7 @@ def get_user_tweets(screen_name):
                                             count = 200, 
                                             exclude_replies = True ,
                                             include_rts = True)
-        return [result['text'] for result in results]
+        return results
     except TwythonAuthError:
         print "Tweets are protected for " + screen_name
 
@@ -52,9 +52,9 @@ def save_tweets():
     except TwythonRateLimitError:
         print 'Twitter request limit exceeded.'
         save_unames(circle_names[index_seen+1:])
-        print 'User_name.txt has users from %d', (index_seen + 1)
+        print 'User_name.txt has users from ', (index_seen + 1)
         save_json(circle_tweet_data)
-        print 'Json upto user %d saved', index_seen
+        print 'Json upto user ', index_seen, ' saved.'
         return True
     save_json(circle_tweet_data)
     open('user_names.txt', 'w').close()
@@ -66,5 +66,4 @@ def run():
         time.sleep(900)
     print "Done"
 
-time.sleep(900)
 run()

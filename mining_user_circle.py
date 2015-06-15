@@ -25,9 +25,6 @@ def get_user_circle(circle_ids):
         circle_ids = circle_ids[PER_REQUEST_COUNT:]
     return circle
 
-def compute_circle(follower_ids, friend_ids):
-    return list(follower_ids.union(friend_ids))
-
 def save_circle_names(circle):
     with open('user_names.txt', 'w') as nfile:
         nfile.write('\n'.join([user['screen_name'] for user in circle]))
@@ -41,12 +38,12 @@ def save_circle_info(circle):
         for user in circle:
             user_status = user.get('status').get('text').encode('ascii', 'ignore') if user.get('status') else None
             user_location = user.get('location').encode('ascii', 'ignore')
-            user_info = [user.get('follow_request_sent'), user.get('profile_use_background_image'),
+            user_info = [user.get('screen_name'), user.get('follow_request_sent'), user.get('profile_use_background_image'),
                          user.get('verified'), user.get('profile_location'), user.get('followers_count'),
                          user.get('statuses_count'), user_location, user.get('following'),
                          user.get('favourites_count'), user.get('time_zone'), user.get('protected'),
                          user_status]
-            print user_info
+            #print user_info
             writer.writerow(user_info)
     print 'Circle info written to file'
 
@@ -54,8 +51,9 @@ def save_circle_info(circle):
 def save_circle(screen_name):
     follower_ids = set(twitter.get_followers_ids(screen_name = screen_name)['ids'])
     friend_ids = set(twitter.get_friends_ids(screen_name = screen_name)['ids'])
-    circle_ids = compute_circle(follower_ids, friend_ids)
+    circle_ids = list(follower_ids.union(friend_ids))
     circle = get_user_circle(circle_ids)
+    #pretty_print(circle)
     save_circle_names(circle)
     save_circle_info(circle)
     
